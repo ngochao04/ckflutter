@@ -1,8 +1,7 @@
-// lib/presentation/providers/providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../domain/entities/antique_item.dart';
@@ -27,8 +26,9 @@ final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
 
-final firebaseStorageProvider = Provider<FirebaseStorage>((ref) {
-  return FirebaseStorage.instance;
+// Supabase thay vì Firebase Storage
+final supabaseClientProvider = Provider<SupabaseClient>((ref) {
+  return Supabase.instance.client;
 });
 
 final connectivityProvider = Provider<Connectivity>((ref) {
@@ -61,8 +61,9 @@ final antiqueRepositoryProvider = Provider<AntiqueRepository>((ref) {
   );
 });
 
+// Storage Repository với Supabase
 final storageRepositoryProvider = Provider<StorageRepository>((ref) {
-  return StorageRepositoryImpl(ref.watch(firebaseStorageProvider));
+  return StorageRepositoryImpl(ref.watch(supabaseClientProvider));
 });
 
 // UseCase Providers
