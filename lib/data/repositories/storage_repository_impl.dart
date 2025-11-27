@@ -19,21 +19,27 @@ class StorageRepositoryImpl implements StorageRepository {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
       final filePath = '$path/$fileName';
 
+      print('Uploading to: $filePath');
+      print('File size: ${bytes.length} bytes');
+
       await supabase.storage.from(bucketName).uploadBinary(
             filePath,
             bytes,
             fileOptions: FileOptions(
               contentType: 'image/$fileExt',
-              upsert: false,
+              upsert: true, // CHỈ THÊM DÒNG NÀY
             ),
           );
 
       final publicUrl = supabase.storage.from(bucketName).getPublicUrl(filePath);
+      print('Upload success: $publicUrl');
 
       return Right(publicUrl);
     } on StorageException catch (e) {
+      print('Storage error: ${e.message}');
       return Left(ServerFailure(e.message));
     } catch (e) {
+      print('Upload error: $e');
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -47,6 +53,7 @@ class StorageRepositoryImpl implements StorageRepository {
       final List<String> uploadedUrls = [];
 
       for (final file in files) {
+        print('Uploading file ${files.indexOf(file) + 1}/${files.length}');
         final result = await uploadImage(file, path);
         result.fold(
           (failure) => throw Exception(failure.message),
@@ -56,6 +63,7 @@ class StorageRepositoryImpl implements StorageRepository {
 
       return Right(uploadedUrls);
     } catch (e) {
+      print('Multiple upload error: $e');
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -63,7 +71,6 @@ class StorageRepositoryImpl implements StorageRepository {
   @override
   Future<Either<Failure, void>> deleteImage(String imageUrl) async {
     try {
-      // Extract file path from public URL
       final uri = Uri.parse(imageUrl);
       final pathSegments = uri.pathSegments;
       final bucketIndex = pathSegments.indexOf(bucketName);

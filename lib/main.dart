@@ -14,8 +14,11 @@ void main() async {
 
   // Initialize Supabase
   await Supabase.initialize(
-    url: 'https://vfipvhltzaeospuvnire.supabase.co', // Thay bằng Supabase URL của bạn
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaXB2aGx0emFlb3NwdXZuaXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzYwMDEsImV4cCI6MjA3OTc1MjAwMX0.GZhe2SBGu5ifeGudOO1uxJpKT2teM9RB1P9rQOWNUqU', // Thay bằng Supabase Anon Key của bạn
+    url: 'https://vfipvhltzaeospuvnire.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaXB2aGx0emFlb3NwdXZuaXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzYwMDEsImV4cCI6MjA3OTc1MjAwMX0.GZhe2SBGu5ifeGudOO1uxJpKT2teM9RB1P9rQOWNUqU',
+    storageOptions: const StorageClientOptions(
+    retryAttempts: 10,
+    ),
   );
 
   // Initialize Hive
@@ -69,7 +72,7 @@ class MyApp extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xFF8B4513), width: 2),
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
