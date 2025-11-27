@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/antique_item.dart';
 import '../../core/utils/image_helper.dart';
+import '../../core/constants/app_strings.dart';
 import '../providers/providers.dart';
 
 class AddItemScreen extends ConsumerStatefulWidget {
@@ -32,7 +33,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   List<String> _existingImageUrls = [];
   bool _isLoading = false;
 
-  final conditions = ['Excellent', 'Good', 'Fair', 'Poor', 'Restoration Needed'];
+  final conditions = [
+    {'en': 'Excellent', 'vi': AppStrings.excellent},
+    {'en': 'Good', 'vi': AppStrings.good},
+    {'en': 'Fair', 'vi': AppStrings.fair},
+    {'en': 'Poor', 'vi': AppStrings.poor},
+    {'en': 'Restoration Needed', 'vi': AppStrings.restorationNeeded},
+  ];
 
   @override
   void initState() {
@@ -102,7 +109,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
     if (_selectedImages.isEmpty && _existingImageUrls.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add at least one image')),
+        const SnackBar(content: Text(AppStrings.pleaseAddImage)),
       );
       return;
     }
@@ -137,7 +144,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         category: _selectedCategory,
         description: _descriptionController.text.trim(),
         estimatedValue: double.parse(_valueController.text),
-        currency: 'USD',
+        currency: 'VND',
         acquisitionDate: _acquisitionDate,
         origin: _originController.text.trim(),
         period: _periodController.text.trim(),
@@ -161,15 +168,15 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.itemToEdit != null 
-              ? 'Item updated successfully' 
-              : 'Item added successfully'),
+              ? AppStrings.itemUpdatedSuccess
+              : AppStrings.itemAddedSuccess),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('${AppStrings.error}: ${e.toString()}')),
         );
       }
     } finally {
@@ -185,7 +192,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.itemToEdit != null ? 'Edit Item' : 'Add New Item'),
+        title: Text(widget.itemToEdit != null ? AppStrings.editItem : AppStrings.addNewItem),
         actions: [
           if (_isLoading)
             const Center(
@@ -201,7 +208,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           else
             TextButton(
               onPressed: _saveItem,
-              child: const Text('SAVE'),
+              child: Text(AppStrings.save.toUpperCase()),
             ),
         ],
       ),
@@ -212,7 +219,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
           children: [
             // Images Section
             const Text(
-              'Images',
+              AppStrings.images,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -221,7 +228,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
             // Basic Information
             const Text(
-              'Basic Information',
+              AppStrings.basicInformation,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -229,12 +236,12 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'Item Name *',
+                labelText: '${AppStrings.itemName} *',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter item name';
+                  return AppStrings.pleaseEnterItemName;
                 }
                 return null;
               },
@@ -244,13 +251,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               decoration: const InputDecoration(
-                labelText: 'Category *',
+                labelText: '${AppStrings.category} *',
                 border: OutlineInputBorder(),
               ),
               items: categories.map((category) {
                 return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
+                  value: category['en'],
+                  child: Text(category['vi']!),
                 );
               }).toList(),
               onChanged: (value) {
@@ -262,13 +269,14 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(
-                labelText: 'Description *',
+                labelText: '${AppStrings.description} *',
                 border: OutlineInputBorder(),
+                hintText: AppStrings.descriptionHint,
               ),
               maxLines: 3,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter description';
+                  return AppStrings.pleaseEnterDescription;
                 }
                 return null;
               },
@@ -277,7 +285,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
             // Value & Condition
             const Text(
-              'Value & Condition',
+              AppStrings.valueAndCondition,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -285,17 +293,17 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _valueController,
               decoration: const InputDecoration(
-                labelText: 'Estimated Value (USD) *',
+                labelText: '${AppStrings.estimatedValue} *',
                 border: OutlineInputBorder(),
-                prefixText: '\$ ',
+                prefixText: '₫ ',
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter estimated value';
+                  return AppStrings.pleaseEnterValue;
                 }
                 if (double.tryParse(value) == null) {
-                  return 'Please enter a valid number';
+                  return AppStrings.pleaseEnterValidNumber;
                 }
                 return null;
               },
@@ -305,13 +313,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             DropdownButtonFormField<String>(
               value: _selectedCondition,
               decoration: const InputDecoration(
-                labelText: 'Condition *',
+                labelText: '${AppStrings.condition} *',
                 border: OutlineInputBorder(),
               ),
               items: conditions.map((condition) {
                 return DropdownMenuItem(
-                  value: condition,
-                  child: Text(condition),
+                  value: condition['en'],
+                  child: Text(condition['vi']!),
                 );
               }).toList(),
               onChanged: (value) {
@@ -322,7 +330,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
             // Origin & History
             const Text(
-              'Origin & History',
+              AppStrings.originAndHistory,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -330,7 +338,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _originController,
               decoration: const InputDecoration(
-                labelText: 'Origin/Location',
+                labelText: AppStrings.origin,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -339,15 +347,15 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _periodController,
               decoration: const InputDecoration(
-                labelText: 'Period/Era',
+                labelText: AppStrings.period,
                 border: OutlineInputBorder(),
-                hintText: 'e.g., Victorian, Ming Dynasty, 1920s',
+                hintText: AppStrings.periodHint,
               ),
             ),
             const SizedBox(height: 16),
 
             ListTile(
-              title: const Text('Acquisition Date'),
+              title: const Text(AppStrings.acquisitionDate),
               subtitle: Text(
                 '${_acquisitionDate.day}/${_acquisitionDate.month}/${_acquisitionDate.year}',
               ),
@@ -373,9 +381,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             TextFormField(
               controller: _provenanceController,
               decoration: const InputDecoration(
-                labelText: 'Provenance (History of Ownership)',
+                labelText: AppStrings.provenance,
                 border: OutlineInputBorder(),
-                hintText: 'Document the item\'s history and previous owners',
+                hintText: AppStrings.provenanceHint,
               ),
               maxLines: 4,
             ),
@@ -490,7 +498,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               child: OutlinedButton.icon(
                 onPressed: _pickImages,
                 icon: const Icon(Icons.photo_library),
-                label: const Text('Gallery'),
+                label: const Text(AppStrings.gallery),
               ),
             ),
             const SizedBox(width: 12),
@@ -498,7 +506,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               child: OutlinedButton.icon(
                 onPressed: _takePicture,
                 icon: const Icon(Icons.camera_alt),
-                label: const Text('Camera'),
+                label: const Text(AppStrings.camera),
               ),
             ),
           ],

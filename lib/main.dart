@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data/models/antique_item_model.dart';
 import 'presentation/screens/splash_screen.dart';
 
@@ -12,14 +11,7 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp();
 
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: 'https://vfipvhltzaeospuvnire.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaXB2aGx0emFlb3NwdXZuaXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzYwMDEsImV4cCI6MjA3OTc1MjAwMX0.GZhe2SBGu5ifeGudOO1uxJpKT2teM9RB1P9rQOWNUqU',
-    storageOptions: const StorageClientOptions(
-    retryAttempts: 10,
-    ),
-  );
+  // ❌ XÓA TOÀN BỘ CODE SUPABASE Ở ĐÂY
 
   // Initialize Hive
   await Hive.initFlutter();

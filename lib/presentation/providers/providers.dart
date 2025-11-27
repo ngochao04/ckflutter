@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../domain/entities/antique_item.dart';
@@ -11,7 +10,7 @@ import '../../domain/usecases/get_items_usecase.dart';
 import '../../domain/usecases/create_item_usecase.dart';
 import '../../domain/usecases/search_items_usecase.dart';
 import '../../data/repositories/antique_repository_impl.dart';
-import '../../data/repositories/storage_repository_impl.dart';
+import '../../data/repositories/imgbb_storage_repository.dart'; // THÊM DÒNG NÀY
 import '../../data/datasources/antique_remote_datasource.dart';
 import '../../data/datasources/antique_local_datasource.dart';
 import '../../data/models/antique_item_model.dart';
@@ -24,10 +23,6 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
-});
-
-final supabaseClientProvider = Provider<SupabaseClient>((ref) {
-  return Supabase.instance.client;
 });
 
 final connectivityProvider = Provider<Connectivity>((ref) {
@@ -60,8 +55,9 @@ final antiqueRepositoryProvider = Provider<AntiqueRepository>((ref) {
   );
 });
 
+// ✅ THAY ĐỔI Ở ĐÂY - Dùng ImgBB thay vì Supabase
 final storageRepositoryProvider = Provider<StorageRepository>((ref) {
-  return StorageRepositoryImpl(ref.watch(supabaseClientProvider));
+  return ImgBBStorageRepository();
 });
 
 // UseCase Providers
@@ -73,7 +69,6 @@ final createItemUseCaseProvider = Provider<CreateItemUseCase>((ref) {
   return CreateItemUseCase(ref.watch(antiqueRepositoryProvider));
 });
 
-// FIX: Thêm dấu ngoặc nhọn { sau ((ref)
 final searchItemsUseCaseProvider = Provider<SearchItemsUseCase>((ref) {
   return SearchItemsUseCase(ref.watch(antiqueRepositoryProvider));
 });
@@ -252,19 +247,20 @@ class ItemsNotifier extends StateNotifier<ItemsState> {
 final selectedItemProvider = StateProvider<AntiqueItem?>((ref) => null);
 
 // Categories Provider
-final categoriesProvider = Provider<List<String>>((ref) {
+// Categories Provider - THAY ĐỔI Ở ĐÂY
+final categoriesProvider = Provider<List<Map<String, String>>>((ref) {
   return [
-    'Furniture',
-    'Ceramics',
-    'Paintings',
-    'Jewelry',
-    'Textiles',
-    'Sculptures',
-    'Books',
-    'Coins',
-    'Stamps',
-    'Instruments',
-    'Others',
+    {'en': 'Furniture', 'vi': 'Đồ gỗ'},
+    {'en': 'Ceramics', 'vi': 'Gốm sứ'},
+    {'en': 'Paintings', 'vi': 'Tranh vẽ'},
+    {'en': 'Jewelry', 'vi': 'Trang sức'},
+    {'en': 'Textiles', 'vi': 'Vải dệt'},
+    {'en': 'Sculptures', 'vi': 'Điêu khắc'},
+    {'en': 'Books', 'vi': 'Sách cổ'},
+    {'en': 'Coins', 'vi': 'Tiền xu'},
+    {'en': 'Stamps', 'vi': 'Tem'},
+    {'en': 'Instruments', 'vi': 'Nhạc cụ'},
+    {'en': 'Others', 'vi': 'Khác'},
   ];
 });
 

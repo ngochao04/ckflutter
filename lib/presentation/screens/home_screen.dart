@@ -11,6 +11,7 @@ import 'item_detail_screen.dart';
 import 'add_item_screen.dart';
 import 'search_screen.dart';
 import 'statistics_screen.dart';
+import '../../core/constants/app_strings.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final currencyFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+  final currencyFormatter = NumberFormat.currency(symbol: '₫', decimalDigits: 0);
 
   @override
   void initState() {
@@ -35,11 +36,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Antique Collection'),
+        title: const Text(AppStrings.antiqueCollection),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
+            tooltip: AppStrings.search,
             onPressed: () {
               Navigator.push(
                 context,
@@ -49,6 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.bar_chart),
+            tooltip: AppStrings.statistics,
             onPressed: () {
               Navigator.push(
                 context,
@@ -73,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Icon(Icons.cloud_off, size: 16, color: Colors.orange[900]),
                         const SizedBox(width: 8),
                         Text(
-                          'Offline Mode',
+                          AppStrings.offlineMode,
                           style: TextStyle(color: Colors.orange[900]),
                         ),
                       ],
@@ -104,13 +107,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           }
         },
         icon: const Icon(Icons.add),
-        label: const Text('Add Item'),
+        label: const Text(AppStrings.addItem),
       ),
     );
   }
 
   Widget _buildCategoryFilter() {
-    final categories = ref.watch(categoriesProvider);
     final selectedCategory = ref.watch(itemsProvider).selectedCategory;
 
     return Container(
@@ -121,15 +123,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _CategoryChip(
-            label: 'All',
+            label: AppStrings.all,
             isSelected: selectedCategory == null,
             onTap: () => ref.read(itemsProvider.notifier).setCategory(null),
           ),
-          ...categories.map((category) => _CategoryChip(
-            label: category,
-            isSelected: selectedCategory == category,
-            onTap: () => ref.read(itemsProvider.notifier).setCategory(category),
-          )),
+          _CategoryChip(
+            label: AppStrings.furniture,
+            isSelected: selectedCategory == 'Furniture',
+            onTap: () => ref.read(itemsProvider.notifier).setCategory('Furniture'),
+          ),
+          _CategoryChip(
+            label: AppStrings.ceramics,
+            isSelected: selectedCategory == 'Ceramics',
+            onTap: () => ref.read(itemsProvider.notifier).setCategory('Ceramics'),
+          ),
+          _CategoryChip(
+            label: AppStrings.paintings,
+            isSelected: selectedCategory == 'Paintings',
+            onTap: () => ref.read(itemsProvider.notifier).setCategory('Paintings'),
+          ),
+          _CategoryChip(
+            label: AppStrings.jewelry,
+            isSelected: selectedCategory == 'Jewelry',
+            onTap: () => ref.read(itemsProvider.notifier).setCategory('Jewelry'),
+          ),
+          _CategoryChip(
+            label: AppStrings.others,
+            isSelected: selectedCategory == 'Others',
+            onTap: () => ref.read(itemsProvider.notifier).setCategory('Others'),
+          ),
         ],
       ),
     );
@@ -150,8 +172,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (state.items.isEmpty) {
       return const EmptyState(
         icon: Icons.collections,
-        title: 'No Items Yet',
-        message: 'Start building your collection by adding your first antique item',
+        title: AppStrings.noItemsYet,
+        message: AppStrings.startBuilding,
       );
     }
 
@@ -227,7 +249,7 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final currencyFormatter = NumberFormat.currency(symbol: '₫', decimalDigits: 0);
 
     return GestureDetector(
       onTap: onTap,
@@ -284,7 +306,7 @@ class _ItemCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item.category,
+                      _getCategoryVietnamese(item.category),
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -307,5 +329,21 @@ class _ItemCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getCategoryVietnamese(String category) {
+    switch (category) {
+      case 'Furniture': return AppStrings.furniture;
+      case 'Ceramics': return AppStrings.ceramics;
+      case 'Paintings': return AppStrings.paintings;
+      case 'Jewelry': return AppStrings.jewelry;
+      case 'Textiles': return AppStrings.textiles;
+      case 'Sculptures': return AppStrings.sculptures;
+      case 'Books': return AppStrings.books;
+      case 'Coins': return AppStrings.coins;
+      case 'Stamps': return AppStrings.stamps;
+      case 'Instruments': return AppStrings.instruments;
+      default: return AppStrings.others;
+    }
   }
 }

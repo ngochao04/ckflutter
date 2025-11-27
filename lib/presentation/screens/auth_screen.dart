@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../providers/providers.dart';
+import '../../core/constants/app_strings.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -48,22 +49,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       String message;
       switch (e.code) {
         case 'user-not-found':
-          message = 'No user found with this email';
+          message = AppStrings.userNotFound;
           break;
         case 'wrong-password':
-          message = 'Wrong password';
+          message = AppStrings.wrongPassword;
           break;
         case 'email-already-in-use':
-          message = 'Email already in use';
+          message = AppStrings.emailInUse;
           break;
         case 'weak-password':
-          message = 'Password is too weak';
+          message = AppStrings.weakPassword;
           break;
         case 'invalid-email':
-          message = 'Invalid email address';
+          message = AppStrings.invalidEmail;
           break;
         default:
-          message = e.message ?? 'Authentication failed';
+          message = e.message ?? AppStrings.authFailed;
       }
       
       if (mounted) {
@@ -74,7 +75,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('${AppStrings.error}: ${e.toString()}')),
         );
       }
     } finally {
@@ -113,7 +114,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                   // Title
                   Text(
-                    'Antique Manager',
+                    AppStrings.appName,
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -122,7 +123,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Manage your precious collection',
+                    AppStrings.appSubtitle,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -135,16 +136,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
+                      labelText: AppStrings.email,
                       prefixIcon: Icon(Icons.email),
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
+                        return AppStrings.pleaseEnterEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'Please enter a valid email';
+                        return AppStrings.pleaseEnterValidEmail;
                       }
                       return null;
                     },
@@ -156,7 +157,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: AppStrings.password,
                       prefixIcon: const Icon(Icons.lock),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
@@ -170,10 +171,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return AppStrings.pleaseEnterPassword;
                       }
                       if (!_isLogin && value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return AppStrings.passwordTooShort;
                       }
                       return null;
                     },
@@ -193,7 +194,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : Text(
-                              _isLogin ? 'LOGIN' : 'SIGN UP',
+                              _isLogin ? AppStrings.login.toUpperCase() : AppStrings.signup.toUpperCase(),
                               style: const TextStyle(fontSize: 16),
                             ),
                     ),
@@ -207,8 +208,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     },
                     child: Text(
                       _isLogin
-                          ? 'Don\'t have an account? Sign up'
-                          : 'Already have an account? Login',
+                          ? AppStrings.dontHaveAccount
+                          : AppStrings.alreadyHaveAccount,
                     ),
                   ),
                 ],
