@@ -6,16 +6,44 @@ import 'package:intl/intl.dart';
 import '../../domain/entities/antique_item.dart';
 import '../providers/providers.dart';
 import 'add_item_screen.dart';
+import '../../core/constants/app_strings.dart';
 
 class ItemDetailScreen extends ConsumerWidget {
   final AntiqueItem item;
 
   const ItemDetailScreen({super.key, required this.item});
 
+  String _getCategoryVietnamese(String category) {
+    switch (category) {
+      case 'Furniture': return AppStrings.furniture;
+      case 'Ceramics': return AppStrings.ceramics;
+      case 'Paintings': return AppStrings.paintings;
+      case 'Jewelry': return AppStrings.jewelry;
+      case 'Textiles': return AppStrings.textiles;
+      case 'Sculptures': return AppStrings.sculptures;
+      case 'Books': return AppStrings.books;
+      case 'Coins': return AppStrings.coins;
+      case 'Stamps': return AppStrings.stamps;
+      case 'Instruments': return AppStrings.instruments;
+      default: return AppStrings.others;
+    }
+  }
+
+  String _getConditionVietnamese(String condition) {
+    switch (condition) {
+      case 'Excellent': return AppStrings.excellent;
+      case 'Good': return AppStrings.good;
+      case 'Fair': return AppStrings.fair;
+      case 'Poor': return AppStrings.poor;
+      case 'Restoration Needed': return AppStrings.restorationNeeded;
+      default: return condition;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currencyFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
-    final dateFormatter = DateFormat('MMM dd, yyyy');
+    final currencyFormatter = NumberFormat.currency(symbol: '₫', decimalDigits: 0);
+    final dateFormatter = DateFormat('dd/MM/yyyy');
 
     return Scaffold(
       body: CustomScrollView(
@@ -53,6 +81,7 @@ class ItemDetailScreen extends ConsumerWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit),
+                tooltip: AppStrings.edit,
                 onPressed: () async {
                   final result = await Navigator.push(
                     context,
@@ -67,6 +96,7 @@ class ItemDetailScreen extends ConsumerWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.delete),
+                tooltip: AppStrings.delete,
                 onPressed: () => _showDeleteDialog(context, ref),
               ),
             ],
@@ -89,7 +119,7 @@ class ItemDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Chip(
-                    label: Text(item.category),
+                    label: Text(_getCategoryVietnamese(item.category)),
                     backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
                   ),
                   const SizedBox(height: 24),
@@ -97,7 +127,7 @@ class ItemDetailScreen extends ConsumerWidget {
                   // Value
                   _InfoCard(
                     icon: Icons.attach_money,
-                    title: 'Estimated Value',
+                    title: AppStrings.estimatedValue,
                     content: currencyFormatter.format(item.estimatedValue),
                     color: Colors.green,
                   ),
@@ -106,16 +136,16 @@ class ItemDetailScreen extends ConsumerWidget {
                   // Condition
                   _InfoCard(
                     icon: Icons.star,
-                    title: 'Condition',
-                    content: item.condition,
+                    title: AppStrings.condition,
+                    content: _getConditionVietnamese(item.condition),
                     color: _getConditionColor(item.condition),
                   ),
                   const SizedBox(height: 16),
 
                   // Description
-                  const Text(
-                    'Description',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.description,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -129,9 +159,9 @@ class ItemDetailScreen extends ConsumerWidget {
 
                   // Origin & Period
                   if (item.origin.isNotEmpty || item.period.isNotEmpty) ...[
-                    const Text(
-                      'Origin & Period',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.originAndHistory,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -140,13 +170,13 @@ class ItemDetailScreen extends ConsumerWidget {
                     if (item.origin.isNotEmpty)
                       _DetailRow(
                         icon: Icons.location_on,
-                        label: 'Origin',
+                        label: AppStrings.origin,
                         value: item.origin,
                       ),
                     if (item.period.isNotEmpty)
                       _DetailRow(
                         icon: Icons.history,
-                        label: 'Period',
+                        label: AppStrings.period,
                         value: item.period,
                       ),
                     const SizedBox(height: 24),
@@ -155,16 +185,16 @@ class ItemDetailScreen extends ConsumerWidget {
                   // Acquisition Date
                   _DetailRow(
                     icon: Icons.calendar_today,
-                    label: 'Acquisition Date',
+                    label: AppStrings.acquisitionDate,
                     value: dateFormatter.format(item.acquisitionDate),
                   ),
                   const SizedBox(height: 24),
 
                   // Provenance
                   if (item.provenance.isNotEmpty) ...[
-                    const Text(
-                      'Provenance',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.provenance,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -189,11 +219,11 @@ class ItemDetailScreen extends ConsumerWidget {
                   const Divider(),
                   const SizedBox(height: 16),
                   Text(
-                    'Created: ${dateFormatter.format(item.createdAt)}',
+                    '${AppStrings.created}: ${dateFormatter.format(item.createdAt)}',
                     style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   Text(
-                    'Last Updated: ${dateFormatter.format(item.updatedAt)}',
+                    '${AppStrings.lastUpdated}: ${dateFormatter.format(item.updatedAt)}',
                     style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   const SizedBox(height: 32),
@@ -227,12 +257,12 @@ class ItemDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Item'),
-        content: Text('Are you sure you want to delete "${item.name}"?'),
+        title: const Text(AppStrings.deleteItem),
+        content: Text('${AppStrings.deleteConfirm} "${item.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
+            child: const Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -241,11 +271,14 @@ class ItemDetailScreen extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.pop(context, true);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Item deleted successfully')),
+                  const SnackBar(content: Text(AppStrings.itemDeletedSuccess)),
                 );
               }
             },
-            child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+            child: Text(
+              AppStrings.delete.toUpperCase(),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

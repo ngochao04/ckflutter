@@ -2,18 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/providers.dart';
+import '../../core/constants/app_strings.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
 
+  String _getCategoryVietnamese(String category) {
+    switch (category) {
+      case 'Furniture': return AppStrings.furniture;
+      case 'Ceramics': return AppStrings.ceramics;
+      case 'Paintings': return AppStrings.paintings;
+      case 'Jewelry': return AppStrings.jewelry;
+      case 'Textiles': return AppStrings.textiles;
+      case 'Sculptures': return AppStrings.sculptures;
+      case 'Books': return AppStrings.books;
+      case 'Coins': return AppStrings.coins;
+      case 'Stamps': return AppStrings.stamps;
+      case 'Instruments': return AppStrings.instruments;
+      default: return AppStrings.others;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(statisticsProvider);
-    final currencyFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final currencyFormatter = NumberFormat.currency(symbol: '₫', decimalDigits: 0);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statistics'),
+        title: const Text(AppStrings.statistics),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -21,7 +38,7 @@ class StatisticsScreen extends ConsumerWidget {
           // Summary Cards
           _StatCard(
             icon: Icons.inventory,
-            title: 'Total Items',
+            title: AppStrings.totalItems,
             value: stats['totalItems'].toString(),
             color: Colors.blue,
           ),
@@ -29,7 +46,7 @@ class StatisticsScreen extends ConsumerWidget {
           
           _StatCard(
             icon: Icons.attach_money,
-            title: 'Total Value',
+            title: AppStrings.totalValue,
             value: currencyFormatter.format(stats['totalValue']),
             color: Colors.green,
           ),
@@ -37,7 +54,7 @@ class StatisticsScreen extends ConsumerWidget {
           
           _StatCard(
             icon: Icons.trending_up,
-            title: 'Average Value',
+            title: AppStrings.averageValue,
             value: currencyFormatter.format(stats['averageValue']),
             color: Colors.orange,
           ),
@@ -45,7 +62,7 @@ class StatisticsScreen extends ConsumerWidget {
 
           // Category Breakdown
           const Text(
-            'Items by Category',
+            AppStrings.itemsByCategory,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -57,13 +74,13 @@ class StatisticsScreen extends ConsumerWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
-                child: Text('No items yet'),
+                child: Text(AppStrings.noItemsYet),
               ),
             )
           else
             ...(stats['categoryCounts'] as Map<String, int>).entries.map(
               (entry) => _CategoryCard(
-                category: entry.key,
+                category: _getCategoryVietnamese(entry.key),
                 count: entry.value,
                 totalItems: stats['totalItems'],
               ),
@@ -169,7 +186,7 @@ class _CategoryCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '$count items ($percentage%)',
+                  '$count ${AppStrings.items} ($percentage%)',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],

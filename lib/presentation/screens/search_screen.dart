@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../providers/providers.dart';
 import '../widgets/empty_state.dart';
 import 'item_detail_screen.dart';
+import '../../core/constants/app_strings.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -15,7 +16,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _searchController = TextEditingController();
-  final currencyFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+  final currencyFormatter = NumberFormat.currency(symbol: '₫', decimalDigits: 0);
 
   @override
   void dispose() {
@@ -31,22 +32,45 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
   }
 
+  String _getCategoryVietnamese(String category) {
+    switch (category) {
+      case 'Furniture': return AppStrings.furniture;
+      case 'Ceramics': return AppStrings.ceramics;
+      case 'Paintings': return AppStrings.paintings;
+      case 'Jewelry': return AppStrings.jewelry;
+      case 'Textiles': return AppStrings.textiles;
+      case 'Sculptures': return AppStrings.sculptures;
+      case 'Books': return AppStrings.books;
+      case 'Coins': return AppStrings.coins;
+      case 'Stamps': return AppStrings.stamps;
+      case 'Instruments': return AppStrings.instruments;
+      default: return AppStrings.others;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemsState = ref.watch(itemsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Search items...',
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.white70),
+        title: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
           ),
-          style: const TextStyle(color: Colors.white, fontSize: 18),
-          onChanged: _performSearch,
+          child: TextField(
+            controller: _searchController,
+            autofocus: true,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            decoration: InputDecoration(
+              hintText: AppStrings.searchItems,
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onChanged: _performSearch,
+          ),
         ),
         actions: [
           if (_searchController.text.isNotEmpty)
@@ -65,11 +89,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ? EmptyState(
                   icon: Icons.search_off,
                   title: _searchController.text.isEmpty
-                      ? 'Start Searching'
-                      : 'No Results Found',
+                      ? AppStrings.startSearching
+                      : AppStrings.noResultsFound,
                   message: _searchController.text.isEmpty
-                      ? 'Enter keywords to search for items'
-                      : 'Try different keywords',
+                      ? AppStrings.enterKeywords
+                      : AppStrings.tryDifferentKeywords,
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -118,7 +142,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text(item.category),
+                            Text(_getCategoryVietnamese(item.category)),
                             const SizedBox(height: 4),
                             Text(
                               currencyFormatter.format(item.estimatedValue),
